@@ -1,6 +1,8 @@
 'use client'
 import { useState } from 'react'
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+
 export default function Home(){
   const [q,setQ]=useState('artificial intelligence')
   const [results,setResults]=useState<any[]>([])
@@ -10,14 +12,14 @@ export default function Home(){
 
   const search = async()=>{
     setLoading(true)
-    const r = await fetch('http://localhost:8000/library/search',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query:q,limit:12})})
+    const r = await fetch(`${API_URL}/library/search`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query:q,limit:12})})
     const j = await r.json()
     setResults(j.results||[])
     setLoading(false)
   }
   const ask = async()=>{
     setLoading(true)
-    const r = await fetch('http://localhost:8000/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:chat, use_library:true, top_k:6})})
+    const r = await fetch(`${API_URL}/chat`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:chat, use_library:true, top_k:6})})
     const j = await r.json()
     setAnswer(j)
     setLoading(false)

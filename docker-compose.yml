@@ -29,7 +29,7 @@ services:
     volumes:
       - ./backend:/app/backend
       - ./data:/app/data
-    command: celery -A backend.workers.celery_app worker --loglevel=info
+    command: celery -A backend.workers.celery:celery_app worker --loglevel=info
 
   postgres:
     image: postgres:16-alpine
@@ -56,6 +56,30 @@ services:
       - "6334:6334"
     volumes:
       - qdrant_data:/qdrant/storage
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+
+  # Cloudflare Tunnel — expose ไป Internet โดยไม่ต้อง forward port
+  # ตั้ง ingress ใน Cloudflare Zero Trust ให้ชี้ http://frontend:3000 (และ http://api:8000)
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run
+    environment:
+      - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
+    depends_on:
+      - frontend
+      - api
 
 volumes:
   postgres_data:
