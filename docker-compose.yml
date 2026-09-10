@@ -57,6 +57,25 @@ services:
     volumes:
       - qdrant_data:/qdrant/storage
 
+  # 01 WEB SEARCH — SearXNG metasearch (เปิด JSON API สำหรับ backend)
+  searxng:
+    image: searxng/searxng:latest
+    container_name: searxng
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./searxng:/etc/searxng
+    environment:
+      - SEARXNG_BASE_URL=${SEARXNG_BASE_URL:-http://localhost:8080/}
+      - SEARXNG_SECRET=${SEARXNG_SECRET:-vihokai-searxng-change-me}
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETGID
+      - SETUID
+
   frontend:
     build:
       context: ./frontend

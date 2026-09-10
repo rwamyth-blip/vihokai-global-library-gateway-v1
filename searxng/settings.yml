@@ -1,0 +1,22 @@
+# SearXNG settings — สำหรับ VihokAI Search Mesh (layer 01 WEB SEARCH)
+# ใช้ค่าพื้นฐานของ SearXNG แล้ว override เฉพาะที่จำเป็น
+use_default_settings: true
+
+server:
+  # เปลี่ยน secret_key ผ่าน env SEARXNG_SECRET ได้
+  secret_key: "vihokai-searxng-change-me"
+  # ปิด limiter เพื่อให้เรียก JSON API จาก backend ได้
+  limiter: false
+  image_proxy: false
+
+search:
+  safe_search: 0
+  autocomplete: ""
+  default_lang: "auto"
+  # ⭐ จำเป็น: เปิด JSON format ให้ backend เรียกใช้
+  formats:
+    - html
+    - json
+
+ui:
+  static_use_hash: true
