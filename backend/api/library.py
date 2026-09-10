@@ -13,7 +13,10 @@ library_router = LibraryRouter()
 class SearchRequest(BaseModel):
     query: str = Field(..., examples=["artificial intelligence"])
     limit: int = Field(10, ge=1, le=50)
-    sources: Optional[List[str]] = Field(None, description="openlibrary, loc, crossref, nasa")
+    sources: Optional[List[str]] = Field(
+        None,
+        description="searxng, local, openlibrary, loc, crossref, nasa, google_books, wikipedia, internet_archive, firecrawl",
+    )
     enable_rerank: bool = True
     enable_dedup: bool = True
 
@@ -49,7 +52,21 @@ async def ingest_to_rag(req: IngestRequest):
 @router.get("/providers")
 def list_providers():
     return {
-        "v1": ["openlibrary", "loc", "crossref", "nasa"],
+        "mesh": {
+            "01_web": ["searxng"],
+            "02_local": ["local (Qdrant index ตัวเอง)"],
+            "03_library": [
+                "openlibrary", "loc", "crossref", "nasa",
+                "google_books", "wikipedia", "internet_archive",
+            ],
+            "04_ai": ["firecrawl", "exa/serper/brave (ผ่าน chat_service)"],
+            "05_llm": ["groq", "gemini", "openai", "deepseek", "kimi", "claude", "meta_llama"],
+            "06_rag_agents": ["research_agent", "judge_agent", "image_agent", "multi_ai_rag"],
+        },
+        "v1": [
+            "local", "searxng", "openlibrary", "loc", "crossref", "nasa",
+            "google_books", "wikipedia", "internet_archive", "firecrawl",
+        ],
         "v2_planned": ["worldcat", "europeana", "hathitrust", "dpla", "openalex", "pubmed", "arxiv"],
-        "v3_planned": ["esa", "semantic_scholar"]
+        "v3_planned": ["esa", "semantic_scholar"],
     }
